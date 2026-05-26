@@ -1,0 +1,37 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+.env/
+.env
+env/
+
+# macOS
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Distribution / packaging
+*.egg-info/
+build/
+dist/
+
+# Python cache
+pip-wheel-metadata/
+
+# File
+.env
+
+# Docker
+*.log
