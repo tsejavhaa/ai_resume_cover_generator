@@ -33,6 +33,7 @@ pip-wheel-metadata/
 # File
 .env
 *.pdf
+EXPLANATION.md
 
 # Docker
 *.log
