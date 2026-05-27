@@ -35,6 +35,92 @@ JOB_TITLE_PATTERNS = [
     r"\bcto\b|\bceo\b|\bcfo\b|\bcoo\b",
 ]
 
+# ── Role → expected skills knowledge base ──────────────────────
+# Maps normalized role key to a set of modern tools/technologies
+# that professionals in that role are typically expected to know.
+ROLE_SKILL_MAP: dict[str, set[str]] = {
+    "machine learning": {
+        "pytorch", "tensorflow", "huggingface", "transformers",
+        "scikit-learn", "pandas", "numpy", "jupyter", "mlflow",
+    },
+    "data science": {
+        "pandas", "numpy", "scikit-learn", "jupyter",
+        "sql", "r", "tableau", "matplotlib", "seaborn",
+    },
+    "data engineer": {
+        "spark", "airflow", "kafka", "sql", "python",
+        "aws", "gcp", "azure", "hadoop", "snowflake", "bigquery", "dbt",
+    },
+    "devops": {
+        "docker", "kubernetes", "terraform", "ansible",
+        "jenkins", "ci/cd", "aws", "gcp", "azure",
+        "prometheus", "grafana", "linux",
+    },
+    "backend": {
+        "fastapi", "django", "flask", "sql", "redis",
+        "kafka", "docker", "aws", "rest", "graphql", "grpc",
+    },
+    "frontend": {
+        "react", "vue", "angular", "typescript", "css",
+        "html", "nextjs", "tailwind", "sass",
+    },
+    "fullstack": {
+        "react", "node.js", "typescript", "python",
+        "sql", "docker", "aws", "graphql", "rest",
+    },
+    "ai engineer": {
+        "pytorch", "tensorflow", "huggingface", "langchain",
+        "vector database", "rag", "llm", "openai", "mlflow",
+        "python", "docker",
+    },
+    "data analyst": {
+        "sql", "python", "r", "tableau", "power bi",
+        "excel", "pandas", "numpy",
+    },
+    "software engineer": {
+        "python", "java", "javascript", "typescript",
+        "git", "docker", "sql", "rest", "ci/cd",
+        "aws", "gcp", "agile",
+    },
+}
+
+# Role detection patterns — mapped to ROLE_SKILL_MAP keys
+ROLE_DETECTION_PATTERNS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"\b(ml|machine learning|ai|artificial intelligence)\s*(engineer|scientist|specialist)\b", re.IGNORECASE), "machine learning"),
+    (re.compile(r"\b(ai|ml)\s*(engineer|developer)\b", re.IGNORECASE), "ai engineer"),
+    (re.compile(r"\bdata\s*scientist\b", re.IGNORECASE), "data science"),
+    (re.compile(r"\bdata\s*engineer\b", re.IGNORECASE), "data engineer"),
+    (re.compile(r"\bdata\s*analyst\b", re.IGNORECASE), "data analyst"),
+    (re.compile(r"\bdevops\s*(engineer|specialist)?\b", re.IGNORECASE), "devops"),
+    (re.compile(r"\bsre\b|\bsite\s*reliability\s*engineer\b", re.IGNORECASE), "devops"),
+    (re.compile(r"\bbackend\s*(engineer|developer)?\b", re.IGNORECASE), "backend"),
+    (re.compile(r"\bfrontend\s*(engineer|developer)?\b", re.IGNORECASE), "frontend"),
+    (re.compile(r"\bfull.?stack\s*(engineer|developer)?\b", re.IGNORECASE), "fullstack"),
+    (re.compile(r"\bsoftware\s*(engineer|developer)\b", re.IGNORECASE), "software engineer"),
+]
+
+
+def infer_role_skills(job_title: str, job_description: str = "") -> list[str]:
+    """
+    Infer what skills are expected for the detected role.
+    Checks the job title first, then falls back to scanning the JD.
+    Returns a sorted list of recommended skill keywords.
+    """
+    combined = f"{job_title} {job_description}"
+    matched_roles: set[str] = set()
+
+    for pattern, role_key in ROLE_DETECTION_PATTERNS:
+        if pattern.search(combined):
+            matched_roles.add(role_key)
+
+    # Collect all expected skills for matched roles
+    expected: set[str] = set()
+    for role in matched_roles:
+        expected |= ROLE_SKILL_MAP.get(role, set())
+
+    return sorted(expected)
+
+
 REQUIRED_SIGNAL = re.compile(
     r"\b(required|must have|minimum|mandatory|you (have|bring|possess))\b",
     re.IGNORECASE,

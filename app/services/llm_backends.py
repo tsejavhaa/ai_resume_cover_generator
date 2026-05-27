@@ -82,7 +82,7 @@ class OllamaBackend(LLMBackend):
         }
         logger.debug(f"Ollama request → {url} model={self._model}")
         # 300s timeout: first run loads model into memory (~60-90s on iMac)
-        async with httpx.AsyncClient(timeout=httpx.Timeout(connect=10.0, read=300.0, write=30.0, pool=5.0)) as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(connect=10.0, read=600.0, write=30.0, pool=5.0)) as client:
             resp = await client.post(url, json=payload)
             resp.raise_for_status()
             data = resp.json()
@@ -140,7 +140,7 @@ class DeepSeekBackend(LLMBackend):
             "max_tokens": max_tokens,
         }
         logger.debug(f"DeepSeek request → {url} model={self._model}")
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(connect=10.0, read=300.0, write=30.0, pool=5.0)) as client:
             resp = await client.post(url, json=payload, headers=headers)
             resp.raise_for_status()
             data = resp.json()

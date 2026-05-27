@@ -64,8 +64,9 @@ async def _process_message(raw_value: dict) -> None:
         logger.info(f"Job completed: {job_id}")
 
     except Exception as e:
-        logger.exception(f"Job {job_id} failed: {e}")
-        await set_failed(job_id, str(e))
+        error_msg = str(e) or f"{type(e).__name__} (no details)"
+        logger.exception(f"Job {job_id} failed: {error_msg}")
+        await set_failed(job_id, error_msg)
         await ws_manager.broadcast(job_id, {
             "status": "failed",
             "job_id": job_id,
@@ -100,26 +101,28 @@ async def start_consumer_pool() -> None:
     )
 
     # Retry loop — Kafka may not be ready immediately at startup
-    for attempt in range(10):
+    # Retry indefinitely (every 30s after the first few attempts) so the
+    # consumer picks up once Kafka becomes available
+    attempt = 0
+    while True:
+        attempt += 1
+        consumer = AIOKafkaConsumer(
+            settings.kafka_topic,
+            bootstrap_servers=settings.kafka_bootstrap_servers,
+            group_id=settings.kafka_consumer_group,
+            auto_offset_reset="earliest",
+            enable_auto_commit=True,
+            value_deserializer=lambda v: v,  # raw bytes; decoded in worker
+        )
         try:
-            consumer = AIOKafkaConsumer(
-                settings.kafka_topic,
-                bootstrap_servers=settings.kafka_bootstrap_servers,
-                group_id=settings.kafka_consumer_group,
-                auto_offset_reset="earliest",
-                enable_auto_commit=True,
-                value_deserializer=lambda v: v,  # raw bytes; decoded in worker
-            )
             await consumer.start()
             logger.info("Kafka consumer connected")
             break
         except KafkaConnectionError as e:
-            wait = 2 ** attempt
-            logger.warning(f"Kafka not ready (attempt {attempt+1}/10), retrying in {wait}s: {e}")
+            wait = min(2 ** attempt, 30)
+            logger.warning(f"Kafka not ready (attempt {attempt}), retrying in {wait}s: {e}")
+            await consumer.stop()
             await asyncio.sleep(wait)
-    else:
-        logger.error("Could not connect to Kafka after 10 attempts. Consumer pool not started.")
-        return
 
     try:
         # Spawn N workers all sharing the same consumer

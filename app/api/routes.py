@@ -17,12 +17,20 @@ from loguru import logger
 
 from app.models.schemas import (
     GenerateRequest, GenerateResponse,
-    JobMessage, SubmitResponse, StatusResponse,
+    JobMessage, SubmitResponse, StatusResponse, PreviewResponse,
     ToneEnum, BackendEnum, ErrorResponse, JobStatusEnum,
+    ImproveResumeRequest, ImproveResumeResponse,
+    JobHistoryListResponse, JobHistoryListItem, JobHistoryEntry,
 )
 from app.services.generator import generate
+from app.services.resume_generator import improve_resume
+from app.services.parser import extract_text
+from app.services.nlp_extractor import (
+    extract_resume_profile, infer_role_skills,
+)
 from app.services.llm_backends import get_backend
 from app.services.storage.redis_store import create_job, get_job
+from app.services.history_service import list_history, get_history_entry
 from app.kafka.producer import publish_job, encode_file
 from app.kafka.websocket_manager import ws_manager
 
@@ -152,6 +160,45 @@ async def websocket_endpoint(websocket: WebSocket, job_id: str):
         ws_manager.disconnect(job_id, websocket)
 
 
+# ── Resume Improvement ────────────────────────────────────────
+
+@router.post("/improve-resume", response_model=ImproveResumeResponse, summary="[Sync] Generate improved resume")
+async def improve_resume_endpoint(
+    resume: UploadFile = File(...),
+    job_description: str = Form(..., min_length=50),
+    tone: ToneEnum = Form(default=ToneEnum.professional),
+    backend: BackendEnum | None = Form(default=None),
+):
+    file_bytes = await resume.read()
+    _validate_upload(resume, file_bytes)
+    request = ImproveResumeRequest(
+        job_description=job_description, tone=tone, backend=backend,
+    )
+    logger.info(f"[improve-resume] file={resume.filename} size={len(file_bytes)}B")
+    try:
+        return await improve_resume(request, file_bytes, resume.filename or "resume.txt")
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        logger.error(f"Resume improvement failed: {e}\n{traceback.format_exc()}")
+        raise HTTPException(500, f"Resume improvement failed: {type(e).__name__}: {e}")
+
+
+# ── Job History ────────────────────────────────────────────────
+
+@router.get("/history", response_model=JobHistoryListResponse, summary="List generation history")
+async def list_history_endpoint(limit: int = 20):
+    return await list_history(limit=limit)
+
+
+@router.get("/history/{entry_id}", response_model=JobHistoryEntry, summary="Get history entry details")
+async def get_history_endpoint(entry_id: str):
+    entry = await get_history_entry(entry_id)
+    if entry is None:
+        raise HTTPException(404, f"History entry '{entry_id}' not found or expired.")
+    return entry
+
+
 # ── Health check ──────────────────────────────────────────────
 
 @router.get("/health", summary="Backend availability")
@@ -167,6 +214,39 @@ async def health():
 
 
 # ── Phase 3: Export endpoints ─────────────────────────────────
+
+# ── Phase 1.5: Resume preview (pre-submission) ──────────────
+
+@router.post("/preview", response_model=PreviewResponse, summary="Preview parsed resume content")
+async def preview_resume(
+    resume: UploadFile = File(...),
+):
+    file_bytes = await resume.read()
+    _validate_upload(resume, file_bytes)
+    filename = resume.filename or "resume.txt"
+
+    text = extract_text(file_bytes, filename)
+    if not text or len(text) < 100:
+        raise HTTPException(400, "Could not extract meaningful text from the uploaded file.")
+
+    profile = extract_resume_profile(text)
+    role_expected = infer_role_skills(" ".join(profile.job_titles), text)
+
+    preview = text[:500]
+    if len(text) > 500:
+        preview += "\n… [truncated]"
+
+    return PreviewResponse(
+        filename=filename,
+        resume_text_preview=preview,
+        skills=profile.skills,
+        job_titles=profile.job_titles,
+        organizations=profile.organizations,
+        education=profile.education,
+        inferred_role=" ".join(profile.job_titles[:2]) or "General",
+        role_expected_skills=role_expected,
+    )
+
 
 from fastapi.responses import Response
 from app.services.exporter import export_pdf, export_docx, export_markdown

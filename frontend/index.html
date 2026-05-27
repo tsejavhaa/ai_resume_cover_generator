@@ -8,18 +8,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a28;
-    --border: #2a2a3e;
+    --bg: #07070d;
+    --surface: #10101a;
+    --surface2: #18182a;
+    --surface3: #20203a;
+    --border: #282840;
+    --border-light: #38385a;
     --accent: #7c6cfa;
     --accent2: #fa6c9a;
     --accent3: #6cfacc;
-    --text: #e8e8f0;
-    --muted: #6868a0;
+    --accent-dim: rgba(124,108,250,0.12);
+    --text: #e8e8f5;
+    --text-dim: #9898b8;
+    --muted: #5858a0;
     --danger: #fa6c6c;
     --success: #6cfaaa;
     --warn: #fad06c;
+    --radius: 14px;
+    --radius-sm: 10px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,9 +36,11 @@
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* ── Background grid ── */
+  /* ── Background ── */
   body::before {
     content: '';
     position: fixed; inset: 0;
@@ -40,141 +48,166 @@
       linear-gradient(var(--border) 1px, transparent 1px),
       linear-gradient(90deg, var(--border) 1px, transparent 1px);
     background-size: 48px 48px;
-    opacity: 0.3;
+    opacity: 0.15;
     pointer-events: none;
     z-index: 0;
   }
 
   /* ── Glow orbs ── */
-  .orb {
-    position: fixed; border-radius: 50%;
-    filter: blur(100px); pointer-events: none; z-index: 0;
-  }
-  .orb-1 { width: 600px; height: 600px; top: -200px; left: -100px; background: rgba(124,108,250,0.12); }
-  .orb-2 { width: 400px; height: 400px; bottom: -100px; right: -100px; background: rgba(250,108,154,0.10); }
+  .orb { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+  .orb-1 { width: 700px; height: 700px; top: -300px; left: -200px; background: rgba(124,108,250,0.08); }
+  .orb-2 { width: 500px; height: 500px; bottom: -200px; right: -200px; background: rgba(250,108,154,0.07); }
 
   /* ── Layout ── */
-  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
   /* ── Header ── */
   header {
-    padding: 40px 0 32px;
-    display: flex; align-items: center; gap: 16px;
+    padding: 36px 0 28px;
+    display: flex; align-items: center; gap: 14px;
   }
   .logo {
-    width: 40px; height: 40px; border-radius: 10px;
+    width: 38px; height: 38px; border-radius: 10px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    display: grid; place-items: center; font-size: 20px; flex-shrink: 0;
+    display: grid; place-items: center; font-size: 18px; flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(124,108,250,0.25);
   }
-  .brand { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .brand { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
   .brand span { color: var(--accent); }
-  .tagline { margin-left: auto; font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .tagline {
+    margin-left: auto; font-size: 11px; color: var(--muted);
+    font-family: 'DM Mono', monospace; padding: 4px 10px;
+    border: 1px solid var(--border); border-radius: 6px;
+    background: var(--surface);
+  }
 
   /* ── Section titles ── */
   .section-label {
-    font-family: 'DM Mono', monospace; font-size: 11px;
-    text-transform: uppercase; letter-spacing: 2px;
-    color: var(--accent); margin-bottom: 12px;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 2.5px;
+    color: var(--accent); margin-bottom: 14px;
+    opacity: 0.85;
   }
 
   /* ── Cards ── */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius);
     padding: 28px;
     margin-bottom: 20px;
+    transition: border-color 0.2s;
   }
+  .card:hover { border-color: var(--border-light); }
 
   /* ── Upload zone ── */
   .upload-zone {
     border: 2px dashed var(--border);
-    border-radius: 12px;
-    padding: 40px 24px;
+    border-radius: var(--radius-sm);
+    padding: 44px 24px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s ease;
     position: relative;
+    background: var(--surface);
   }
-  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(124,108,250,0.06); }
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: var(--accent-dim); transform: translateY(-1px); }
   .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-  .upload-icon { font-size: 36px; margin-bottom: 12px; }
-  .upload-text { font-size: 14px; color: var(--muted); }
+  .upload-icon { font-size: 32px; margin-bottom: 10px; opacity: 0.7; }
+  .upload-text { font-size: 14px; color: var(--text-dim); }
   .upload-text strong { color: var(--text); }
   .file-badge {
     display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(124,108,250,0.15); border: 1px solid rgba(124,108,250,0.4);
+    background: var(--accent-dim); border: 1px solid rgba(124,108,250,0.35);
     border-radius: 8px; padding: 8px 14px; font-size: 13px;
     font-family: 'DM Mono', monospace; margin-top: 12px;
+    animation: fadeSlideIn 0.3s ease;
   }
 
   /* ── Form elements ── */
   textarea, select {
     width: 100%; background: var(--surface2);
-    border: 1px solid var(--border); border-radius: 10px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
     color: var(--text); font-family: 'DM Sans', sans-serif;
     font-size: 14px; padding: 14px 16px;
-    transition: border-color 0.2s; resize: vertical;
-    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: vertical; outline: none;
   }
-  textarea:focus, select:focus { border-color: var(--accent); }
-  textarea { min-height: 140px; line-height: 1.6; }
+  textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  textarea { min-height: 130px; line-height: 1.65; }
+  select option { background: var(--surface); }
 
   /* ── Options row ── */
-  .options-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-  .opt-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-family: 'DM Mono', monospace; }
+  .options-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  .opt-group label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; font-family: 'DM Mono', monospace; letter-spacing: 0.5px; }
 
   /* ── Buttons ── */
   .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 14px 28px; border-radius: 10px; font-size: 14px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 28px; border-radius: var(--radius-sm); font-size: 14px;
     font-weight: 500; cursor: pointer; border: none;
-    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s ease; font-family: 'DM Sans', sans-serif;
+    position: relative; overflow: hidden;
   }
   .btn-primary {
     background: linear-gradient(135deg, var(--accent), #9d8ff8);
     color: white; width: 100%; justify-content: center;
     margin-top: 20px; font-size: 15px; padding: 16px;
   }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,108,250,0.35); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-  .btn-sm {
-    padding: 8px 16px; font-size: 13px; border-radius: 8px;
-    background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text);
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,108,250,0.4); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-secondary {
+    background: linear-gradient(135deg, var(--accent3), #5ae8b8);
+    color: #07070d; width: 100%; justify-content: center;
+    margin-top: 12px; font-size: 15px; padding: 16px;
   }
-  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(108,250,204,0.35); }
+  .btn-secondary:active { transform: translateY(0); }
+  .btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-sm {
+    padding: 7px 14px; font-size: 12px; border-radius: 7px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-dim); cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
   /* ── Progress / status ── */
   .status-bar {
     display: none; margin-bottom: 20px;
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 20px 28px;
+    border-radius: var(--radius); padding: 20px 28px;
   }
-  .status-bar.visible { display: block; }
+  .status-bar.visible { display: block; animation: fadeSlideIn 0.3s ease; }
   .status-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
   .spinner {
-    width: 20px; height: 20px; border-radius: 50%;
+    width: 18px; height: 18px; border-radius: 50%;
     border: 2px solid var(--border); border-top-color: var(--accent);
-    animation: spin 0.8s linear infinite; flex-shrink: 0;
+    animation: spin 0.7s linear infinite; flex-shrink: 0;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .status-text { font-family: 'DM Mono', monospace; font-size: 13px; }
   .progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; width: 0; transition: width 0.8s ease; }
-  .steps { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; width: 0; transition: width 0.6s ease; }
+  .steps { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
   .step {
-    font-size: 11px; font-family: 'DM Mono', monospace;
+    font-size: 10px; font-family: 'DM Mono', monospace;
     padding: 4px 10px; border-radius: 20px;
     background: var(--surface2); color: var(--muted);
     border: 1px solid var(--border); transition: all 0.3s;
   }
-  .step.active { background: rgba(124,108,250,0.15); color: var(--accent); border-color: var(--accent); }
-  .step.done { background: rgba(108,250,170,0.12); color: var(--success); border-color: rgba(108,250,170,0.4); }
+  .step.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+  .step.done { background: rgba(108,250,170,0.1); color: var(--success); border-color: rgba(108,250,170,0.35); }
 
   /* ── Results ── */
   #results { display: none; }
-  #results.visible { display: block; }
+  #results.visible { display: block; animation: fadeSlideIn 0.4s ease; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   /* ── Score ring ── */
   .score-block {
@@ -184,53 +217,58 @@
   .score-ring-wrap { position: relative; flex-shrink: 0; }
   .score-ring { transform: rotate(-90deg); }
   .score-bg { fill: none; stroke: var(--surface2); stroke-width: 6; }
-  .score-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1.2s ease; }
+  .score-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1.4s cubic-bezier(0.4, 0, 0.2, 1); }
   .score-label {
     position: absolute; inset: 0; display: grid; place-items: center;
     font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
   }
   .score-meta h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .score-meta p { font-size: 13px; color: var(--muted); }
+  .score-meta p { font-size: 13px; color: var(--text-dim); }
 
   /* ── Skill pills ── */
-  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .pill {
-    font-size: 12px; font-family: 'DM Mono', monospace;
-    padding: 4px 12px; border-radius: 20px;
+    font-size: 11px; font-family: 'DM Mono', monospace;
+    padding: 3px 10px; border-radius: 20px;
+    transition: transform 0.15s;
   }
-  .pill-match { background: rgba(108,250,170,0.12); color: var(--success); border: 1px solid rgba(108,250,170,0.3); }
-  .pill-miss { background: rgba(250,108,108,0.12); color: var(--danger); border: 1px solid rgba(250,108,108,0.3); }
+  .pill:hover { transform: translateY(-1px); }
+  .pill-match { background: rgba(108,250,170,0.1); color: var(--success); border: 1px solid rgba(108,250,170,0.25); }
+  .pill-miss { background: rgba(250,108,108,0.1); color: var(--danger); border: 1px solid rgba(250,108,108,0.25); }
 
   /* ── Cover letter ── */
   .cover-letter-text {
     font-size: 14px; line-height: 1.85; color: var(--text);
     white-space: pre-wrap; padding: 20px;
-    background: var(--surface2); border-radius: 10px;
+    background: var(--surface2); border-radius: var(--radius-sm);
     border: 1px solid var(--border);
   }
 
   /* ── Tweaks ── */
   .tweak {
-    border: 1px solid var(--border); border-radius: 12px;
-    overflow: hidden; margin-bottom: 12px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden; margin-bottom: 10px;
+    transition: border-color 0.2s;
   }
+  .tweak:hover { border-color: var(--border-light); }
   .tweak-header {
     display: flex; align-items: center; gap: 10px;
-    padding: 12px 16px; background: var(--surface2);
+    padding: 10px 14px; background: var(--surface2);
     border-bottom: 1px solid var(--border);
   }
   .tweak-badge {
-    font-size: 11px; font-family: 'DM Mono', monospace;
+    font-size: 10px; font-family: 'DM Mono', monospace;
     padding: 2px 8px; border-radius: 4px;
-    background: rgba(124,108,250,0.15); color: var(--accent);
-    border: 1px solid rgba(124,108,250,0.3);
+    background: var(--accent-dim); color: var(--accent);
+    border: 1px solid rgba(124,108,250,0.25);
+    text-transform: uppercase; letter-spacing: 0.5px;
   }
-  .tweak-reason { font-size: 12px; color: var(--muted); }
-  .tweak-body { padding: 14px 16px; display: grid; gap: 10px; }
+  .tweak-reason { font-size: 12px; color: var(--text-dim); }
+  .tweak-body { padding: 12px 14px; display: grid; gap: 8px; }
   .tweak-row { font-size: 13px; line-height: 1.6; }
   .tweak-before { color: var(--danger); }
   .tweak-after { color: var(--success); }
-  .tweak-row span { font-family: 'DM Mono', monospace; font-size: 11px; opacity: 0.7; margin-right: 6px; }
+  .tweak-row span { font-family: 'DM Mono', monospace; font-size: 10px; opacity: 0.6; margin-right: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 
   /* ── Export buttons ── */
   .export-row {
@@ -240,9 +278,9 @@
   }
   .btn-export {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 10px 18px; border-radius: 8px; font-size: 13px;
+    padding: 9px 16px; border-radius: 8px; font-size: 12px;
     cursor: pointer; border: 1px solid var(--border);
-    background: var(--surface2); color: var(--text);
+    background: var(--surface2); color: var(--text-dim);
     font-family: 'DM Sans', sans-serif; transition: all 0.2s;
     text-decoration: none;
   }
@@ -250,25 +288,97 @@
 
   /* ── Error banner ── */
   .error-banner {
-    display: none; background: rgba(250,108,108,0.1);
-    border: 1px solid rgba(250,108,108,0.3); border-radius: 12px;
-    padding: 16px 20px; margin-bottom: 20px;
+    display: none; background: rgba(250,108,108,0.08);
+    border: 1px solid rgba(250,108,108,0.25); border-radius: var(--radius-sm);
+    padding: 14px 18px; margin-bottom: 20px;
     font-size: 14px; color: var(--danger);
+    animation: fadeSlideIn 0.25s ease;
   }
   .error-banner.visible { display: block; }
 
+  /* ── History list items ── */
+  .history-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    margin-bottom: 4px;
+  }
+  .history-item:hover {
+    background: var(--surface2);
+    border-color: var(--border);
+  }
+  .history-item:active { transform: scale(0.995); }
+  .history-icon { font-size: 16px; flex-shrink: 0; }
+  .history-body { flex: 1; min-width: 0; }
+  .history-title { font-size: 13px; color: var(--text); }
+  .history-meta { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .history-score {
+    font-size: 13px; font-weight: 600; font-family: 'Syne', sans-serif;
+    flex-shrink: 0;
+  }
+
   /* ── Footer ── */
   footer {
-    text-align: center; padding: 40px 0;
-    font-size: 12px; color: var(--muted);
+    text-align: center; padding: 36px 0;
+    font-size: 11px; color: var(--muted);
     font-family: 'DM Mono', monospace;
     border-top: 1px solid var(--border); margin-top: 40px;
   }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    z-index: 100; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; width: 100%; max-width: 720px;
+    max-height: 90vh; display: flex; flex-direction: column;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+  .modal-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 24px; border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .modal-header .icon { font-size: 20px; }
+  .modal-header .title { font-size: 15px; font-weight: 600; flex:1; }
+  .modal-close {
+    background: none; border: none; color: var(--muted);
+    font-size: 20px; cursor: pointer; padding: 4px 8px;
+    border-radius: 6px; font-family: 'DM Sans', sans-serif;
+  }
+  .modal-close:hover { background: var(--surface2); color: var(--text); }
+  .modal-body {
+    padding: 20px 24px; overflow-y: auto; flex: 1;
+  }
+  .modal-meta {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px;
+    margin-bottom: 20px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace;
+  }
+  .modal-meta span { color: var(--text); }
+  .modal-section-label {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 2px;
+    color: var(--accent); margin-bottom: 10px; margin-top: 20px;
+  }
+  .modal-section-label:first-child { margin-top: 0; }
 
   @media (max-width: 600px) {
     .options-row { grid-template-columns: 1fr; }
     .score-block { flex-direction: column; align-items: flex-start; }
     .tagline { display: none; }
+    .modal { max-height: 95vh; }
+    .modal-header { padding: 16px 18px; }
+    .modal-body { padding: 16px 18px; }
   }
 </style>
 </head>
@@ -282,67 +392,94 @@
   <header>
     <div class="logo">✦</div>
     <div class="brand">Resume<span>AI</span></div>
-    <div class="tagline">// Phase 1+2+3 running</div>
+    <div class="tagline">// Cover Letter + Resume Improvement</div>
   </header>
 
-  <!-- Upload form -->
-  <div class="card">
+  <!-- ── 01 — Upload ── -->
+  <div class="card" id="uploadCard">
     <div class="section-label">01 — Upload Resume</div>
+    <!-- Full drop zone (hidden after file selected) -->
     <div class="upload-zone" id="uploadZone">
       <input type="file" id="resumeFile" accept=".pdf,.docx,.txt"/>
       <div class="upload-icon">📄</div>
       <div class="upload-text"><strong>Drop your resume here</strong> or click to browse</div>
       <div class="upload-text" style="margin-top:6px;font-size:12px">PDF, DOCX, or TXT — max 5 MB</div>
-      <div id="fileBadge" style="display:none" class="file-badge">
-        <span>📎</span><span id="fileName"></span>
+    </div>
+    <!-- Compact badge (shown after file selected) -->
+    <div id="fileBar" style="display:none">
+      <div class="file-badge" style="margin:0;width:100%;justify-content:space-between">
+        <span><span style="margin-right:8px">📎</span><span id="fileName"></span></span>
+        <button class="btn-sm" onclick="clearFile()" style="padding:2px 8px;font-size:14px;line-height:1;background:none;border:none;color:var(--danger);cursor:pointer">✕</button>
       </div>
     </div>
   </div>
 
+  <!-- ── 02 — Preview ── -->
+  <div class="card" id="previewCard" style="display:none">
+    <div class="section-label">02 — Resume Preview</div>
+    <div id="previewText" style="font-size:13px;line-height:1.7;color:var(--text-dim);background:var(--surface2);border-radius:var(--radius-sm);padding:16px;border:1px solid var(--border);white-space:pre-wrap;max-height:360px;overflow-y:auto"></div>
+  </div>
+
+  <!-- ── 03 — Job Description ── -->
   <div class="card">
-    <div class="section-label">02 — Job Description</div>
-    <textarea id="jobDesc" placeholder="Paste the full job description here…&#10;&#10;The more detail you provide, the better the match analysis and cover letter tailoring."></textarea>
+    <div class="section-label">03 — Job Description</div>
+    <textarea id="jobDesc" rows="14" placeholder="Paste the full job description here — include responsibilities, requirements, qualifications, company info, benefits, etc.&#10;&#10;You can trim irrelevant parts later; more data helps us match better."></textarea>
+  </div>
 
-    <div class="options-row">
-      <div class="opt-group">
-        <label>Tone</label>
-        <select id="tone">
-          <option value="professional">Professional</option>
-          <option value="confident">Confident</option>
-          <option value="concise">Concise</option>
-          <option value="enthusiastic">Enthusiastic</option>
-        </select>
+  <!-- ── 04 — Settings (hidden until button click) ── -->
+  <div class="card" id="settingsCard" style="display:none">
+    <div class="section-label" id="settingsLabel">04 — Configure & Generate</div>
+    <div id="settingsBody">
+      <div class="options-row">
+        <div class="opt-group">
+          <label>Tone</label>
+          <select id="tone">
+            <option value="professional">Professional</option>
+            <option value="confident">Confident</option>
+            <option value="concise">Concise</option>
+            <option value="enthusiastic">Enthusiastic</option>
+          </select>
+        </div>
+        <div class="opt-group" id="lengthGroup">
+          <label>Cover Letter Length</label>
+          <select id="length">
+            <option value="medium" selected>Medium (250–350 words)</option>
+            <option value="short">Short (under 200 words)</option>
+            <option value="long">Long (400–500 words)</option>
+          </select>
+        </div>
       </div>
-      <div class="opt-group">
-        <label>Cover Letter Length</label>
-        <select id="length">
-          <option value="medium" selected>Medium (250–350 words)</option>
-          <option value="short">Short (under 200 words)</option>
-          <option value="long">Long (400–500 words)</option>
-        </select>
+      <div class="options-row" style="margin-top:0">
+        <div class="opt-group">
+          <label>Mode</label>
+          <select id="mode">
+            <option value="sync" selected>Sync (wait inline)</option>
+            <option value="async">Async (Kafka queue)</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label>LLM Backend</label>
+          <select id="backend">
+            <option value="">Auto (from .env)</option>
+            <option value="ollama">Ollama (local)</option>
+            <option value="deepseek">DeepSeek (cloud)</option>
+          </select>
+        </div>
       </div>
     </div>
+    <button class="btn btn-primary" id="generateBtn" onclick="doGenerate()">
+      ✦ Generate Cover
+    </button>
+  </div>
 
-    <div class="options-row" style="margin-top:0">
-      <div class="opt-group">
-        <label>Mode</label>
-        <select id="mode">
-          <option value="async">Async (Kafka queue)</option>
-          <option value="sync">Sync (wait inline)</option>
-        </select>
-      </div>
-      <div class="opt-group">
-        <label>LLM Backend</label>
-        <select id="backend">
-          <option value="">Auto (from .env)</option>
-          <option value="ollama">Ollama (local)</option>
-          <option value="deepseek">DeepSeek (cloud)</option>
-        </select>
-      </div>
-    </div>
-
-    <button class="btn btn-primary" id="submitBtn" onclick="submitJob()">
+  <!-- ── 04 — Action buttons (always visible) ── -->
+  <div class="card" id="actionsCard">
+    <div class="section-label">04 — Choose Action</div>
+    <button class="btn btn-primary" id="coverBtn" onclick="showSettings('cover_letter')">
       ✦ Generate Cover Letter & Tweaks
+    </button>
+    <button class="btn btn-secondary" id="resumeBtn" onclick="showSettings('resume')">
+      ⟳ Generate Improved Resume
     </button>
   </div>
 
@@ -389,12 +526,14 @@
       </div>
       <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:6px">MATCHED SKILLS</div>
       <div class="pill-row" id="matchedPills"></div>
-      <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin:14px 0 6px">MISSING SKILLS</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin:14px 0 6px">MISSING SKILLS (from JD)</div>
       <div class="pill-row" id="missingPills"></div>
+      <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin:14px 0 6px">MODERN SKILLS EXPECTED FOR THIS ROLE</div>
+      <div class="pill-row" id="roleSuggestedPills"></div>
     </div>
 
     <!-- Cover letter -->
-    <div class="card">
+    <div class="card" id="coverLetterCard" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <div class="section-label" style="margin:0">Cover Letter</div>
         <button class="btn btn-sm" onclick="copyText()">⎘ Copy</button>
@@ -413,10 +552,49 @@
       <div id="tweaksList"></div>
     </div>
 
+    <!-- Improved resume -->
+    <div class="card" id="improvedResumeCard" style="display:none">
+      <div class="section-label">Improved Resume</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace">NEW SKILLS ADDED</div>
+      </div>
+      <div class="pill-row" id="newSkillsPills"></div>
+      <div id="improvedResumeSections" style="margin-top:14px"></div>
+      <div style="margin-top:14px">
+        <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:8px">FULL IMPROVED RESUME</div>
+        <div id="improvedResumeFull" style="font-size:13px;line-height:1.85;color:var(--text);white-space:pre-wrap;padding:16px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);max-height:500px;overflow-y:auto"></div>
+      </div>
+      <div class="export-row" id="resumeExportRow" style="display:none">
+        <a class="btn-export" id="resumeExportTxt" href="#" download>⬇ TXT</a>
+        <a class="btn-export" id="resumeExportMd" href="#" download>⬇ Markdown</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- History -->
+  <div class="card" style="margin-top:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="section-label" style="margin:0">Job History</div>
+      <button class="btn btn-sm" onclick="loadHistory()">↻ Refresh</button>
+    </div>
+    <div id="historyList" style="font-size:13px;color:var(--muted)">Click refresh to load history…</div>
+  </div>
+
+  <!-- History Detail Modal -->
+  <div class="modal-overlay" id="historyModal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="icon" id="modalIcon">✦</span>
+        <span class="title" id="modalTitle">History Detail</span>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
   </div>
 
   <footer>
-    ResumeAI — Phase 1 · 2 · 3 complete &nbsp;|&nbsp; FastAPI + Kafka + Redis + Ollama
+    ResumeAI — powered by LLM &nbsp;|&nbsp; FastAPI + Kafka + Redis
   </footer>
 </div>
 
@@ -424,6 +602,7 @@
 const API = 'http://localhost:8000/api/v1';
 let currentJobId = null;
 let pollInterval = null;
+let pendingType = null;
 
 // ── File upload ────────────────────────────────────────────────
 const zone = document.getElementById('uploadZone');
@@ -433,19 +612,71 @@ zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add(
 zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
 zone.addEventListener('drop', e => {
   e.preventDefault(); zone.classList.remove('drag');
-  const file = e.dataTransfer.files[0];
-  if (file) setFile(file);
+  if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
 });
 fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
 
 function setFile(file) {
   document.getElementById('fileName').textContent = file.name;
-  document.getElementById('fileBadge').style.display = 'inline-flex';
+  document.getElementById('uploadZone').style.display = 'none';
+  document.getElementById('fileBar').style.display = 'block';
   fileInput._file = file;
+  previewResume(file);
 }
 
-// ── Submit ────────────────────────────────────────────────────
-async function submitJob() {
+function clearFile() {
+  document.getElementById('uploadZone').style.display = 'block';
+  document.getElementById('fileBar').style.display = 'none';
+  document.getElementById('previewCard').style.display = 'none';
+  fileInput.value = '';
+  delete fileInput._file;
+  hideSettings();
+}
+
+// ── Preview ──────────────────────────────────────────────────
+async function previewResume(file) {
+  const card = document.getElementById('previewCard');
+  card.style.display = 'none';
+  const fd = new FormData();
+  fd.append('resume', file);
+  try {
+    const res = await fetch(API + '/preview', { method: 'POST', body: fd });
+    if (!res.ok) return;
+    const data = await res.json();
+    document.getElementById('previewText').textContent = data.resume_text_preview;
+    card.style.display = 'block';
+  } catch (e) { /* preview unavailable */ }
+}
+
+// ── Phase 1: Show settings ─────────────────────────────────────
+function showSettings(type) {
+  pendingType = type;
+
+  const isCover = type === 'cover_letter';
+  document.getElementById('lengthGroup').style.display = isCover ? '' : 'none';
+  document.getElementById('settingsLabel').textContent = '04 — Configure & Generate';
+  document.getElementById('generateBtn').textContent = isCover ? '✦ Generate Cover' : '⟳ Improve Resume';
+  document.getElementById('generateBtn').className = isCover ? 'btn btn-primary' : 'btn btn-secondary';
+
+  document.getElementById('settingsCard').style.display = 'block';
+  document.getElementById('settingsCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  document.getElementById('coverBtn').textContent = isCover ? '✦ Configure…' : '✦ Generate Cover Letter & Tweaks';
+  document.getElementById('resumeBtn').textContent = isCover ? '⟳ Generate Improved Resume' : '⟳ Configure…';
+}
+
+function hideSettings() {
+  document.getElementById('settingsCard').style.display = 'none';
+  document.getElementById('coverBtn').textContent = '✦ Generate Cover Letter & Tweaks';
+  document.getElementById('resumeBtn').textContent = '⟳ Generate Improved Resume';
+  pendingType = null;
+}
+
+// ── Phase 2: Execute generation ────────────────────────────────
+async function doGenerate() {
+  const type = pendingType;
+  if (!type) return showError('Please select an action first.');
+
   const file = fileInput.files[0] || fileInput._file;
   const jd = document.getElementById('jobDesc').value.trim();
 
@@ -453,19 +684,22 @@ async function submitJob() {
   if (jd.length < 50) return showError('Job description must be at least 50 characters.');
 
   clearError();
-  setSubmitting(true);
-  showStatus('Submitting job…', 5);
+  document.getElementById('results').classList.remove('visible');
+  document.getElementById('coverLetterCard').style.display = 'none';
+  document.getElementById('tweaksCard').style.display = 'none';
+  document.getElementById('improvedResumeCard').style.display = 'none';
 
   const fd = new FormData();
   fd.append('resume', file);
   fd.append('job_description', jd);
   fd.append('tone', document.getElementById('tone').value);
-  fd.append('cover_letter_length', document.getElementById('length').value);
   const backend = document.getElementById('backend').value;
   if (backend) fd.append('backend', backend);
 
-  const mode = document.getElementById('mode').value;
-  const endpoint = mode === 'async' ? '/submit' : '/generate';
+  const endpoint = type === 'resume' ? '/improve-resume' : '/generate';
+
+  setGenerating(true);
+  showStatus('Working…', 10);
 
   try {
     const res = await fetch(API + endpoint, { method: 'POST', body: fd });
@@ -473,61 +707,90 @@ async function submitJob() {
 
     if (!res.ok) return showError(data.detail || 'Submission failed.');
 
-    if (mode === 'sync') {
-      // Sync: result is immediate
-      renderResult(data, null);
-      setSubmitting(false);
-      hideStatus();
+    if (type === 'resume') {
+      renderImprovedResume(data);
     } else {
-      // Async: poll for status
-      currentJobId = data.job_id;
-      document.getElementById('jobIdDisplay').textContent = currentJobId.slice(0, 8) + '…';
-      stepDone('queue');
-      pollStatus(currentJobId);
+      renderResult(data, null);
     }
+    setGenerating(false);
+    hideStatus();
+    hideSettings();
+    loadHistory();
   } catch (err) {
-    showError('Could not reach the API. Is it running at localhost:8000?');
-    setSubmitting(false);
+    const msg = err instanceof TypeError && err.message.includes('fetch')
+      ? 'Could not connect to the API. Is Docker running and port 8000 mapped?'
+      : 'API request failed. The server may be busy processing — try again in a moment.';
+    showError(msg);
+    setGenerating(false);
   }
 }
 
-// ── Polling ───────────────────────────────────────────────────
-function pollStatus(jobId) {
-  let ticks = 0;
-  pollInterval = setInterval(async () => {
-    ticks++;
-    const progress = Math.min(10 + ticks * 3, 85);
-    setProgress(progress);
+// ── Render improved resume ────────────────────────────────────
+function renderImprovedResume(result) {
+  document.getElementById('results').classList.add('visible');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    // Simulate step progression based on elapsed time
-    if (ticks === 2) { stepDone('queue'); stepActive('parse'); showStatus('Parsing resume…', progress); }
-    if (ticks === 4) { stepDone('parse'); stepActive('nlp'); showStatus('Running NLP extraction…', progress); }
-    if (ticks === 8) { stepDone('nlp'); stepActive('match'); showStatus('Computing match score…', progress); }
-    if (ticks === 10) { stepDone('match'); stepActive('llm'); showStatus('Generating with LLM…', progress); }
+  const score = result.match_score;
+  const circ = 213.6;
+  const offset = circ - (score / 100) * circ;
+  const arc = document.getElementById('scoreArc');
+  const color = score >= 60 ? '#6cfaaa' : score >= 40 ? '#fad06c' : '#fa6c6c';
+  arc.style.stroke = color;
+  setTimeout(() => arc.style.strokeDashoffset = offset, 100);
+  document.getElementById('scoreLabel').textContent = score + '%';
+  document.getElementById('scoreLabel').style.color = color;
 
-    try {
-      const res = await fetch(`${API}/status/${jobId}`);
-      const data = await res.json();
+  const title = score >= 70 ? 'Strong match!' : score >= 50 ? 'Moderate match' : 'Weak match — use resume improvement';
+  const desc = `Matched ${result.matched_skills.length} of ${result.matched_skills.length + result.missing_skills.length} key skills`;
+  document.getElementById('scoreTitle').textContent = title;
+  document.getElementById('scoreDesc').textContent = desc + ` · ${result.model_used} via ${result.backend_used}`;
 
-      if (data.status === 'done') {
-        clearInterval(pollInterval);
-        stepDone('llm'); stepDone('done');
-        setProgress(100);
-        showStatus('Complete!', 100);
-        document.getElementById('spinner').style.display = 'none';
-        setTimeout(() => {
-          hideStatus();
-          renderResult(data.result, jobId);
-          setSubmitting(false);
-        }, 600);
-      } else if (data.status === 'failed') {
-        clearInterval(pollInterval);
-        hideStatus();
-        showError('Job failed: ' + (data.error || 'Unknown error'));
-        setSubmitting(false);
-      }
-    } catch (e) { /* network blip, keep polling */ }
-  }, 5000);
+  document.getElementById('matchedPills').innerHTML = result.matched_skills.length
+    ? result.matched_skills.map(s => `<span class="pill pill-match">✓ ${s}</span>`).join('')
+    : '<span style="color:var(--muted);font-size:13px">None detected</span>';
+  document.getElementById('missingPills').innerHTML = result.missing_skills.length
+    ? result.missing_skills.map(s => `<span class="pill pill-miss">✗ ${s}</span>`).join('')
+    : '<span style="color:var(--success);font-size:13px">All key skills matched!</span>';
+  document.getElementById('roleSuggestedPills').innerHTML = result.role_suggested_skills && result.role_suggested_skills.length
+    ? result.role_suggested_skills.map(s => `<span class="pill pill-miss" style="border-color:var(--warn);color:var(--warn);background:rgba(250,208,108,0.12)">✦ ${s}</span>`).join('')
+    : '<span style="color:var(--muted);font-size:13px">None</span>';
+
+  document.getElementById('coverLetterCard').style.display = 'none';
+  document.getElementById('tweaksCard').style.display = 'none';
+
+  document.getElementById('newSkillsPills').innerHTML = result.new_skills_added && result.new_skills_added.length
+    ? result.new_skills_added.map(s => `<span class="pill pill-miss" style="border-color:var(--accent3);color:var(--accent3);background:rgba(108,250,204,0.12)">+ ${s}</span>`).join('')
+    : '<span style="color:var(--muted);font-size:13px">No new skills added (resume already covers them)</span>';
+
+  const container = document.getElementById('improvedResumeSections');
+  if (result.improved_sections && result.improved_sections.length) {
+    container.innerHTML = result.improved_sections.map(s => `
+      <div class="tweak">
+        <div class="tweak-header">
+          <span class="tweak-badge">${s.section}</span>
+          <span class="tweak-reason">${s.reason}</span>
+        </div>
+        <div class="tweak-body">
+          <div class="tweak-row tweak-before"><span>BEFORE</span>${s.original}</div>
+          <div class="tweak-row tweak-after"><span>AFTER &nbsp;</span>${s.improved}</div>
+        </div>
+      </div>`).join('');
+  } else {
+    container.innerHTML = '<span style="color:var(--muted);font-size:13px">No section-level changes detected.</span>';
+  }
+
+  document.getElementById('improvedResumeFull').textContent = result.improved_resume_text;
+
+  // Export links for improved resume
+  const txtBlob = new Blob([result.improved_resume_text], {type: 'text/plain'});
+  const mdBlob = new Blob([result.improved_resume_text], {type: 'text/markdown'});
+  document.getElementById('resumeExportTxt').href = URL.createObjectURL(txtBlob);
+  document.getElementById('resumeExportTxt').download = 'improved_resume.txt';
+  document.getElementById('resumeExportMd').href = URL.createObjectURL(mdBlob);
+  document.getElementById('resumeExportMd').download = 'improved_resume.md';
+  document.getElementById('resumeExportRow').style.display = 'flex';
+
+  document.getElementById('improvedResumeCard').style.display = 'block';
 }
 
 // ── Render result ─────────────────────────────────────────────
@@ -535,7 +798,6 @@ function renderResult(result, jobId) {
   document.getElementById('results').classList.add('visible');
   document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-  // Score ring
   const score = result.match_score;
   const circ = 213.6;
   const offset = circ - (score / 100) * circ;
@@ -551,31 +813,32 @@ function renderResult(result, jobId) {
   document.getElementById('scoreTitle').textContent = title;
   document.getElementById('scoreDesc').textContent = desc + ` · ${result.model_used} via ${result.backend_used}`;
 
-  // Skill pills
-  const matchedEl = document.getElementById('matchedPills');
-  const missingEl = document.getElementById('missingPills');
-  matchedEl.innerHTML = result.matched_skills.length
+  document.getElementById('matchedPills').innerHTML = result.matched_skills.length
     ? result.matched_skills.map(s => `<span class="pill pill-match">✓ ${s}</span>`).join('')
     : '<span style="color:var(--muted);font-size:13px">None detected</span>';
-  missingEl.innerHTML = result.missing_skills.length
+  document.getElementById('missingPills').innerHTML = result.missing_skills.length
     ? result.missing_skills.map(s => `<span class="pill pill-miss">✗ ${s}</span>`).join('')
     : '<span style="color:var(--success);font-size:13px">All key skills matched!</span>';
+  document.getElementById('roleSuggestedPills').innerHTML = result.role_suggested_skills && result.role_suggested_skills.length
+    ? result.role_suggested_skills.map(s => `<span class="pill pill-miss" style="border-color:var(--warn);color:var(--warn);background:rgba(250,208,108,0.12)">✦ ${s}</span>`).join('')
+    : '<span style="color:var(--muted);font-size:13px">None — your resume covers all modern role-expected skills</span>';
 
-  // Cover letter
+  document.getElementById('coverLetterCard').style.display = 'block';
+  document.getElementById('improvedResumeCard').style.display = 'none';
+  document.getElementById('tweaksCard').style.display = 'none';
+  document.getElementById('resumeExportRow').style.display = 'none';
+
   document.getElementById('coverLetterText').textContent = result.cover_letter;
 
-  // Export links
   if (jobId) {
     document.getElementById('exportPdf').href = `${API}/export/${jobId}/pdf`;
     document.getElementById('exportDocx').href = `${API}/export/${jobId}/docx`;
     document.getElementById('exportMd').href = `${API}/export/${jobId}/md`;
     document.getElementById('exportRow').style.display = 'flex';
   } else {
-    // Sync mode: no job_id, hide export links
     document.getElementById('exportRow').style.display = 'none';
   }
 
-  // Tweaks
   const tweaks = result.resume_tweaks.filter(t => t.original || t.suggested);
   if (tweaks.length) {
     document.getElementById('tweaksCard').style.display = 'block';
@@ -593,6 +856,136 @@ function renderResult(result, jobId) {
   }
 }
 
+// ── History ────────────────────────────────────────────────────
+async function loadHistory() {
+  const el = document.getElementById('historyList');
+  el.innerHTML = 'Loading…';
+  try {
+    const res = await fetch(API + '/history?limit=20');
+    const data = await res.json();
+    if (!data.entries || !data.entries.length) {
+      el.innerHTML = '<span style="color:var(--muted)">No history yet. Generate something!</span>';
+      return;
+    }
+    el.innerHTML = data.entries.map(e => {
+      const date = new Date(e.created_at * 1000).toLocaleString();
+      const icon = e.type === 'resume' ? '⟳' : '✦';
+      const label = e.type === 'resume' ? 'Resume' : 'Cover Letter';
+      const scoreColor = e.match_score >= 60 ? 'var(--success)' : e.match_score >= 40 ? 'var(--warn)' : 'var(--danger)';
+      return `<div class="history-item" onclick="viewHistory('${e.id}')">
+        <span class="history-icon">${icon}</span>
+        <div class="history-body">
+          <div class="history-title">${label} · ${e.filename}</div>
+          <div class="history-meta">${date} · ${e.model_used}</div>
+        </div>
+        <span class="history-score" style="color:${scoreColor}">${e.match_score}%</span>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<span style="color:var(--danger)">Failed to load history. Is the API running?</span>';
+  }
+}
+
+async function viewHistory(id) {
+  try {
+    const res = await fetch(API + '/history/' + id);
+    const data = await res.json();
+    if (!res.ok) return;
+    renderHistoryDetail(data);
+    document.getElementById('historyModal').classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  } catch (e) {
+    showError('Failed to load history entry.');
+  }
+}
+
+function closeModal() {
+  document.getElementById('historyModal').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+function renderHistoryDetail(data) {
+  const icon = data.type === 'resume' ? '⟳' : '✦';
+  const label = data.type === 'resume' ? 'Improved Resume' : 'Cover Letter';
+  document.getElementById('modalIcon').textContent = icon;
+  document.getElementById('modalTitle').textContent = `${label} · ${data.filename}`;
+
+  const date = new Date(data.created_at * 1000).toLocaleString();
+  const meta = `
+    <div class="modal-meta">
+      <div>Date <span>${date}</span></div>
+      <div>Score <span style="color:${data.match_score >= 60 ? 'var(--success)' : data.match_score >= 40 ? 'var(--warn)' : 'var(--danger)'}">${data.match_score}%</span></div>
+      <div>Backend <span>${data.backend_used}</span></div>
+      <div>Model <span>${data.model_used}</span></div>
+      <div>Computation <span>${data.computation_time_ms}ms</span></div>
+      <div>Type <span>${label}</span></div>
+    </div>`;
+
+  const esc = s => s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+
+  let body = meta;
+
+  if (data.matched_skills && data.matched_skills.length) {
+    body += `<div class="modal-section-label">Matched Skills</div><div class="pill-row">${data.matched_skills.map(s => '<span class="pill pill-match">✓ '+esc(s)+'</span>').join('')}</div>`;
+  }
+  if (data.missing_skills && data.missing_skills.length) {
+    body += `<div class="modal-section-label">Missing Skills</div><div class="pill-row">${data.missing_skills.map(s => '<span class="pill pill-miss">✗ '+esc(s)+'</span>').join('')}</div>`;
+  }
+  if (data.role_suggested_skills && data.role_suggested_skills.length) {
+    body += `<div class="modal-section-label">Role-Expected Skills</div><div class="pill-row">${data.role_suggested_skills.map(s => '<span class="pill pill-miss" style="border-color:var(--warn);color:var(--warn);background:rgba(250,208,108,0.12)">✦ '+esc(s)+'</span>').join('')}</div>`;
+  }
+
+  if (data.type === 'resume') {
+    if (data.new_skills_added && data.new_skills_added.length) {
+      body += `<div class="modal-section-label">New Skills Added</div><div class="pill-row">${data.new_skills_added.map(s => '<span class="pill pill-miss" style="border-color:var(--accent3);color:var(--accent3);background:rgba(108,250,204,0.12)">+ '+esc(s)+'</span>').join('')}</div>`;
+    }
+    if (data.improved_sections && data.improved_sections.length) {
+      body += `<div class="modal-section-label">Section Improvements</div>`;
+      body += data.improved_sections.map(s => `
+        <div class="tweak">
+          <div class="tweak-header">
+            <span class="tweak-badge">${esc(s.section)}</span>
+            <span class="tweak-reason">${esc(s.reason)}</span>
+          </div>
+          <div class="tweak-body">
+            <div class="tweak-row tweak-before"><span>BEFORE</span>${esc(s.original) || '<em style="color:var(--muted)">(not present)</em>'}</div>
+            <div class="tweak-row tweak-after"><span>AFTER &nbsp;</span>${esc(s.improved)}</div>
+          </div>
+        </div>`).join('');
+    }
+    if (data.improved_resume_text) {
+      body += `<div class="modal-section-label">Full Improved Resume</div>
+        <div style="font-size:13px;line-height:1.85;white-space:pre-wrap;padding:16px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);max-height:400px;overflow-y:auto">${esc(data.improved_resume_text)}</div>`;
+    }
+  } else {
+    if (data.cover_letter) {
+      body += `<div class="modal-section-label">Cover Letter</div>
+        <div style="font-size:14px;line-height:1.85;white-space:pre-wrap;padding:16px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)">${esc(data.cover_letter)}</div>`;
+    }
+    if (data.resume_tweaks && data.resume_tweaks.length) {
+      body += `<div class="modal-section-label">Resume Tweaks</div>`;
+      body += data.resume_tweaks.filter(t => t.original || t.suggested).map(t => `
+        <div class="tweak">
+          <div class="tweak-header">
+            <span class="tweak-badge">${esc(t.section)}</span>
+            <span class="tweak-reason">${esc(t.reason)}</span>
+          </div>
+          <div class="tweak-body">
+            ${t.original ? `<div class="tweak-row tweak-before"><span>BEFORE</span>${esc(t.original)}</div>` : ''}
+            ${t.suggested ? `<div class="tweak-row tweak-after"><span>AFTER &nbsp;</span>${esc(t.suggested)}</div>` : ''}
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  if (data.job_description) {
+    body += `<div class="modal-section-label" style="margin-top:24px">Job Description</div>
+      <div style="font-size:12px;line-height:1.7;color:var(--muted);white-space:pre-wrap;max-height:120px;overflow-y:auto;padding:12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">${esc(data.job_description)}</div>`;
+  }
+
+  document.getElementById('modalBody').innerHTML = body;
+}
+
 // ── Helpers ───────────────────────────────────────────────────
 function showStatus(text, progress) {
   document.getElementById('statusBar').classList.add('visible');
@@ -603,15 +996,17 @@ function hideStatus() { document.getElementById('statusBar').classList.remove('v
 function setProgress(p) { document.getElementById('progressFill').style.width = p + '%'; }
 function stepActive(id) {
   const el = document.getElementById('step-' + id);
-  if (el) { el.className = 'step active'; }
+  if (el) el.className = 'step active';
 }
 function stepDone(id) {
   const el = document.getElementById('step-' + id);
-  if (el) { el.className = 'step done'; }
+  if (el) el.className = 'step done';
 }
-function setSubmitting(state) {
-  document.getElementById('submitBtn').disabled = state;
-  document.getElementById('submitBtn').textContent = state ? '⧖ Processing…' : '✦ Generate Cover Letter & Tweaks';
+function setGenerating(state) {
+  document.getElementById('generateBtn').disabled = state;
+  document.getElementById('generateBtn').textContent = state ? '⧖ Generating…' : (pendingType === 'resume' ? '⟳ Improve Resume' : '✦ Generate Cover');
+  document.getElementById('coverBtn').disabled = state;
+  document.getElementById('resumeBtn').disabled = state;
 }
 function showError(msg) {
   const el = document.getElementById('errorBanner');

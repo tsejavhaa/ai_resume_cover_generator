@@ -92,6 +92,15 @@ class GenerateResponse(BaseModel):
     match_score: int = Field(..., ge=0, le=100)
     matched_skills: list[str]
     missing_skills: list[str]
+    role_suggested_skills: list[str] = Field(
+        default_factory=list,
+        description="Skills expected for the inferred role but missing from resume",
+    )
+    resume_text_preview: str = Field(
+        default="",
+        description="First ~500 chars of parsed resume text for preview",
+        max_length=1000,
+    )
     backend_used: str
     model_used: str
 
@@ -113,6 +122,95 @@ class StatusResponse(BaseModel):
     status: JobStatusEnum
     result: Optional[GenerateResponse] = None
     error: Optional[str] = None
+
+
+class PreviewResponse(BaseModel):
+    """Returned by POST /api/v1/preview."""
+    filename: str
+    resume_text_preview: str
+    skills: list[str]
+    job_titles: list[str]
+    organizations: list[str]
+    education: list[str]
+    inferred_role: str
+    role_expected_skills: list[str]
+
+
+class ImprovedResumeSection(BaseModel):
+    section: str
+    original: str
+    improved: str
+    reason: str
+
+
+class ImproveResumeRequest(BaseModel):
+    job_description: str = Field(..., min_length=50)
+    tone: ToneEnum = ToneEnum.professional
+    backend: Optional[BackendEnum] = None
+
+
+class ImproveResumeResponse(BaseModel):
+    model_config = {"protected_namespaces": ()}
+
+    improved_resume_text: str
+    improved_sections: list[ImprovedResumeSection]
+    match_score: int = Field(..., ge=0, le=100)
+    matched_skills: list[str]
+    missing_skills: list[str]
+    new_skills_added: list[str]
+    role_suggested_skills: list[str] = Field(
+        default_factory=list,
+        description="Skills expected for the inferred role but missing from resume",
+    )
+    resume_text_preview: str = Field(
+        default="",
+        description="Original resume preview (~500 chars)",
+        max_length=1000,
+    )
+    backend_used: str
+    model_used: str
+
+
+class JobHistoryEntry(BaseModel):
+    model_config = {"protected_namespaces": ()}
+
+    id: str
+    type: Literal["cover_letter", "resume"]
+    created_at: float
+    filename: str
+    resume_text_preview: str
+    job_description: str
+    # Cover letter results
+    cover_letter: Optional[str] = None
+    resume_tweaks: list[ResumeTweak] = []
+    # Resume improvement results
+    improved_resume_text: Optional[str] = None
+    improved_sections: list[ImprovedResumeSection] = []
+    new_skills_added: list[str] = []
+    # Shared
+    match_score: int = 0
+    matched_skills: list[str] = []
+    missing_skills: list[str] = []
+    role_suggested_skills: list[str] = []
+    backend_used: str
+    model_used: str
+    computation_time_ms: int = 0
+
+
+class JobHistoryListItem(BaseModel):
+    model_config = {"protected_namespaces": ()}
+
+    id: str
+    type: str
+    created_at: float
+    filename: str
+    match_score: int
+    backend_used: str
+    model_used: str
+
+
+class JobHistoryListResponse(BaseModel):
+    entries: list[JobHistoryListItem]
 
 
 class ErrorResponse(BaseModel):
