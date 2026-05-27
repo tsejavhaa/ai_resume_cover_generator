@@ -92,3 +92,13 @@ async def root():
             "health": "GET /api/v1/health",
         },
     }
+
+
+# ── Serve frontend static files ───────────────────────────────
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
+
+frontend_path = Path(__file__).parent.parent / "frontend"
+if frontend_path.exists():
+    app.mount("/ui", StaticFiles(directory=str(frontend_path), html=True), name="frontend")
+    logger.info(f"Frontend served at /ui")

@@ -9,8 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Verify critical packages installed
-RUN python -c "import pdfminer; import docx; import httpx; print('All packages OK')"
+# Verify critical packages
+RUN python -c "import pdfminer; import docx; import httpx; import redis; import aiokafka; import reportlab; print('All packages OK')"
 
 COPY . .
 

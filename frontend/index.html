@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ResumeAI — Tailored in seconds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a28;
+    --border: #2a2a3e;
+    --accent: #7c6cfa;
+    --accent2: #fa6c9a;
+    --accent3: #6cfacc;
+    --text: #e8e8f0;
+    --muted: #6868a0;
+    --danger: #fa6c6c;
+    --success: #6cfaaa;
+    --warn: #fad06c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Background grid ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Glow orbs ── */
+  .orb {
+    position: fixed; border-radius: 50%;
+    filter: blur(100px); pointer-events: none; z-index: 0;
+  }
+  .orb-1 { width: 600px; height: 600px; top: -200px; left: -100px; background: rgba(124,108,250,0.12); }
+  .orb-2 { width: 400px; height: 400px; bottom: -100px; right: -100px; background: rgba(250,108,154,0.10); }
+
+  /* ── Layout ── */
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* ── Header ── */
+  header {
+    padding: 40px 0 32px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .logo {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: grid; place-items: center; font-size: 20px; flex-shrink: 0;
+  }
+  .brand { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .brand span { color: var(--accent); }
+  .tagline { margin-left: auto; font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  /* ── Section titles ── */
+  .section-label {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 2px;
+    color: var(--accent); margin-bottom: 12px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  /* ── Upload zone ── */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(124,108,250,0.06); }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-icon { font-size: 36px; margin-bottom: 12px; }
+  .upload-text { font-size: 14px; color: var(--muted); }
+  .upload-text strong { color: var(--text); }
+  .file-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(124,108,250,0.15); border: 1px solid rgba(124,108,250,0.4);
+    border-radius: 8px; padding: 8px 14px; font-size: 13px;
+    font-family: 'DM Mono', monospace; margin-top: 12px;
+  }
+
+  /* ── Form elements ── */
+  textarea, select {
+    width: 100%; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 14px; padding: 14px 16px;
+    transition: border-color 0.2s; resize: vertical;
+    outline: none;
+  }
+  textarea:focus, select:focus { border-color: var(--accent); }
+  textarea { min-height: 140px; line-height: 1.6; }
+
+  /* ── Options row ── */
+  .options-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .opt-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-family: 'DM Mono', monospace; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 10px; font-size: 14px;
+    font-weight: 500; cursor: pointer; border: none;
+    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #9d8ff8);
+    color: white; width: 100%; justify-content: center;
+    margin-top: 20px; font-size: 15px; padding: 16px;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,108,250,0.35); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-sm {
+    padding: 8px 16px; font-size: 13px; border-radius: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Progress / status ── */
+  .status-bar {
+    display: none; margin-bottom: 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px 28px;
+  }
+  .status-bar.visible { display: block; }
+  .status-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .spinner {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite; flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .status-text { font-family: 'DM Mono', monospace; font-size: 13px; }
+  .progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; width: 0; transition: width 0.8s ease; }
+  .steps { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .step {
+    font-size: 11px; font-family: 'DM Mono', monospace;
+    padding: 4px 10px; border-radius: 20px;
+    background: var(--surface2); color: var(--muted);
+    border: 1px solid var(--border); transition: all 0.3s;
+  }
+  .step.active { background: rgba(124,108,250,0.15); color: var(--accent); border-color: var(--accent); }
+  .step.done { background: rgba(108,250,170,0.12); color: var(--success); border-color: rgba(108,250,170,0.4); }
+
+  /* ── Results ── */
+  #results { display: none; }
+  #results.visible { display: block; }
+
+  /* ── Score ring ── */
+  .score-block {
+    display: flex; align-items: center; gap: 24px; margin-bottom: 24px;
+    padding-bottom: 24px; border-bottom: 1px solid var(--border);
+  }
+  .score-ring-wrap { position: relative; flex-shrink: 0; }
+  .score-ring { transform: rotate(-90deg); }
+  .score-bg { fill: none; stroke: var(--surface2); stroke-width: 6; }
+  .score-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1.2s ease; }
+  .score-label {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+  }
+  .score-meta h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .score-meta p { font-size: 13px; color: var(--muted); }
+
+  /* ── Skill pills ── */
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .pill {
+    font-size: 12px; font-family: 'DM Mono', monospace;
+    padding: 4px 12px; border-radius: 20px;
+  }
+  .pill-match { background: rgba(108,250,170,0.12); color: var(--success); border: 1px solid rgba(108,250,170,0.3); }
+  .pill-miss { background: rgba(250,108,108,0.12); color: var(--danger); border: 1px solid rgba(250,108,108,0.3); }
+
+  /* ── Cover letter ── */
+  .cover-letter-text {
+    font-size: 14px; line-height: 1.85; color: var(--text);
+    white-space: pre-wrap; padding: 20px;
+    background: var(--surface2); border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── Tweaks ── */
+  .tweak {
+    border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; margin-bottom: 12px;
+  }
+  .tweak-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .tweak-badge {
+    font-size: 11px; font-family: 'DM Mono', monospace;
+    padding: 2px 8px; border-radius: 4px;
+    background: rgba(124,108,250,0.15); color: var(--accent);
+    border: 1px solid rgba(124,108,250,0.3);
+  }
+  .tweak-reason { font-size: 12px; color: var(--muted); }
+  .tweak-body { padding: 14px 16px; display: grid; gap: 10px; }
+  .tweak-row { font-size: 13px; line-height: 1.6; }
+  .tweak-before { color: var(--danger); }
+  .tweak-after { color: var(--success); }
+  .tweak-row span { font-family: 'DM Mono', monospace; font-size: 11px; opacity: 0.7; margin-right: 6px; }
+
+  /* ── Export buttons ── */
+  .export-row {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 20px; border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+  .btn-export {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px; border-radius: 8px; font-size: 13px;
+    cursor: pointer; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text);
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-export:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+  /* ── Error banner ── */
+  .error-banner {
+    display: none; background: rgba(250,108,108,0.1);
+    border: 1px solid rgba(250,108,108,0.3); border-radius: 12px;
+    padding: 16px 20px; margin-bottom: 20px;
+    font-size: 14px; color: var(--danger);
+  }
+  .error-banner.visible { display: block; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center; padding: 40px 0;
+    font-size: 12px; color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    border-top: 1px solid var(--border); margin-top: 40px;
+  }
+
+  @media (max-width: 600px) {
+    .options-row { grid-template-columns: 1fr; }
+    .score-block { flex-direction: column; align-items: flex-start; }
+    .tagline { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">✦</div>
+    <div class="brand">Resume<span>AI</span></div>
+    <div class="tagline">// Phase 1+2+3 running</div>
+  </header>
+
+  <!-- Upload form -->
+  <div class="card">
+    <div class="section-label">01 — Upload Resume</div>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="resumeFile" accept=".pdf,.docx,.txt"/>
+      <div class="upload-icon">📄</div>
+      <div class="upload-text"><strong>Drop your resume here</strong> or click to browse</div>
+      <div class="upload-text" style="margin-top:6px;font-size:12px">PDF, DOCX, or TXT — max 5 MB</div>
+      <div id="fileBadge" style="display:none" class="file-badge">
+        <span>📎</span><span id="fileName"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">02 — Job Description</div>
+    <textarea id="jobDesc" placeholder="Paste the full job description here…&#10;&#10;The more detail you provide, the better the match analysis and cover letter tailoring."></textarea>
+
+    <div class="options-row">
+      <div class="opt-group">
+        <label>Tone</label>
+        <select id="tone">
+          <option value="professional">Professional</option>
+          <option value="confident">Confident</option>
+          <option value="concise">Concise</option>
+          <option value="enthusiastic">Enthusiastic</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <label>Cover Letter Length</label>
+        <select id="length">
+          <option value="medium" selected>Medium (250–350 words)</option>
+          <option value="short">Short (under 200 words)</option>
+          <option value="long">Long (400–500 words)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="options-row" style="margin-top:0">
+      <div class="opt-group">
+        <label>Mode</label>
+        <select id="mode">
+          <option value="async">Async (Kafka queue)</option>
+          <option value="sync">Sync (wait inline)</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <label>LLM Backend</label>
+        <select id="backend">
+          <option value="">Auto (from .env)</option>
+          <option value="ollama">Ollama (local)</option>
+          <option value="deepseek">DeepSeek (cloud)</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="submitBtn" onclick="submitJob()">
+      ✦ Generate Cover Letter & Tweaks
+    </button>
+  </div>
+
+  <!-- Error banner -->
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- Status / progress -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-header">
+      <div class="spinner" id="spinner"></div>
+      <div class="status-text" id="statusText">Submitting job…</div>
+      <div style="margin-left:auto;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)" id="jobIdDisplay"></div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="steps">
+      <div class="step" id="step-queue">queued</div>
+      <div class="step" id="step-parse">parsing</div>
+      <div class="step" id="step-nlp">NLP extraction</div>
+      <div class="step" id="step-match">match score</div>
+      <div class="step" id="step-llm">LLM generation</div>
+      <div class="step" id="step-done">done</div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+
+    <!-- Score + skills -->
+    <div class="card">
+      <div class="section-label">Match Analysis</div>
+      <div class="score-block">
+        <div class="score-ring-wrap">
+          <svg class="score-ring" width="80" height="80" viewBox="0 0 80 80">
+            <circle class="score-bg" cx="40" cy="40" r="34"/>
+            <circle class="score-fill" id="scoreArc" cx="40" cy="40" r="34"
+              stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+          </svg>
+          <div class="score-label" id="scoreLabel">0%</div>
+        </div>
+        <div class="score-meta">
+          <h3 id="scoreTitle">Analyzing…</h3>
+          <p id="scoreDesc"></p>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:6px">MATCHED SKILLS</div>
+      <div class="pill-row" id="matchedPills"></div>
+      <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin:14px 0 6px">MISSING SKILLS</div>
+      <div class="pill-row" id="missingPills"></div>
+    </div>
+
+    <!-- Cover letter -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="section-label" style="margin:0">Cover Letter</div>
+        <button class="btn btn-sm" onclick="copyText()">⎘ Copy</button>
+      </div>
+      <div class="cover-letter-text" id="coverLetterText"></div>
+      <div class="export-row" id="exportRow">
+        <a class="btn-export" id="exportPdf" href="#" download>⬇ PDF</a>
+        <a class="btn-export" id="exportDocx" href="#" download>⬇ DOCX</a>
+        <a class="btn-export" id="exportMd" href="#" download>⬇ Markdown</a>
+      </div>
+    </div>
+
+    <!-- Resume tweaks -->
+    <div class="card" id="tweaksCard" style="display:none">
+      <div class="section-label">Resume Tweaks</div>
+      <div id="tweaksList"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    ResumeAI — Phase 1 · 2 · 3 complete &nbsp;|&nbsp; FastAPI + Kafka + Redis + Ollama
+  </footer>
+</div>
+
+<script>
+const API = 'http://localhost:8000/api/v1';
+let currentJobId = null;
+let pollInterval = null;
+
+// ── File upload ────────────────────────────────────────────────
+const zone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('resumeFile');
+
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) setFile(file);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
+
+function setFile(file) {
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileBadge').style.display = 'inline-flex';
+  fileInput._file = file;
+}
+
+// ── Submit ────────────────────────────────────────────────────
+async function submitJob() {
+  const file = fileInput.files[0] || fileInput._file;
+  const jd = document.getElementById('jobDesc').value.trim();
+
+  if (!file) return showError('Please upload a resume file.');
+  if (jd.length < 50) return showError('Job description must be at least 50 characters.');
+
+  clearError();
+  setSubmitting(true);
+  showStatus('Submitting job…', 5);
+
+  const fd = new FormData();
+  fd.append('resume', file);
+  fd.append('job_description', jd);
+  fd.append('tone', document.getElementById('tone').value);
+  fd.append('cover_letter_length', document.getElementById('length').value);
+  const backend = document.getElementById('backend').value;
+  if (backend) fd.append('backend', backend);
+
+  const mode = document.getElementById('mode').value;
+  const endpoint = mode === 'async' ? '/submit' : '/generate';
+
+  try {
+    const res = await fetch(API + endpoint, { method: 'POST', body: fd });
+    const data = await res.json();
+
+    if (!res.ok) return showError(data.detail || 'Submission failed.');
+
+    if (mode === 'sync') {
+      // Sync: result is immediate
+      renderResult(data, null);
+      setSubmitting(false);
+      hideStatus();
+    } else {
+      // Async: poll for status
+      currentJobId = data.job_id;
+      document.getElementById('jobIdDisplay').textContent = currentJobId.slice(0, 8) + '…';
+      stepDone('queue');
+      pollStatus(currentJobId);
+    }
+  } catch (err) {
+    showError('Could not reach the API. Is it running at localhost:8000?');
+    setSubmitting(false);
+  }
+}
+
+// ── Polling ───────────────────────────────────────────────────
+function pollStatus(jobId) {
+  let ticks = 0;
+  pollInterval = setInterval(async () => {
+    ticks++;
+    const progress = Math.min(10 + ticks * 3, 85);
+    setProgress(progress);
+
+    // Simulate step progression based on elapsed time
+    if (ticks === 2) { stepDone('queue'); stepActive('parse'); showStatus('Parsing resume…', progress); }
+    if (ticks === 4) { stepDone('parse'); stepActive('nlp'); showStatus('Running NLP extraction…', progress); }
+    if (ticks === 8) { stepDone('nlp'); stepActive('match'); showStatus('Computing match score…', progress); }
+    if (ticks === 10) { stepDone('match'); stepActive('llm'); showStatus('Generating with LLM…', progress); }
+
+    try {
+      const res = await fetch(`${API}/status/${jobId}`);
+      const data = await res.json();
+
+      if (data.status === 'done') {
+        clearInterval(pollInterval);
+        stepDone('llm'); stepDone('done');
+        setProgress(100);
+        showStatus('Complete!', 100);
+        document.getElementById('spinner').style.display = 'none';
+        setTimeout(() => {
+          hideStatus();
+          renderResult(data.result, jobId);
+          setSubmitting(false);
+        }, 600);
+      } else if (data.status === 'failed') {
+        clearInterval(pollInterval);
+        hideStatus();
+        showError('Job failed: ' + (data.error || 'Unknown error'));
+        setSubmitting(false);
+      }
+    } catch (e) { /* network blip, keep polling */ }
+  }, 5000);
+}
+
+// ── Render result ─────────────────────────────────────────────
+function renderResult(result, jobId) {
+  document.getElementById('results').classList.add('visible');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Score ring
+  const score = result.match_score;
+  const circ = 213.6;
+  const offset = circ - (score / 100) * circ;
+  const arc = document.getElementById('scoreArc');
+  const color = score >= 60 ? '#6cfaaa' : score >= 40 ? '#fad06c' : '#fa6c6c';
+  arc.style.stroke = color;
+  setTimeout(() => arc.style.strokeDashoffset = offset, 100);
+  document.getElementById('scoreLabel').textContent = score + '%';
+  document.getElementById('scoreLabel').style.color = color;
+
+  const title = score >= 70 ? 'Strong match!' : score >= 50 ? 'Moderate match' : 'Weak match — use the tweaks';
+  const desc = `Matched ${result.matched_skills.length} of ${result.matched_skills.length + result.missing_skills.length} key skills`;
+  document.getElementById('scoreTitle').textContent = title;
+  document.getElementById('scoreDesc').textContent = desc + ` · ${result.model_used} via ${result.backend_used}`;
+
+  // Skill pills
+  const matchedEl = document.getElementById('matchedPills');
+  const missingEl = document.getElementById('missingPills');
+  matchedEl.innerHTML = result.matched_skills.length
+    ? result.matched_skills.map(s => `<span class="pill pill-match">✓ ${s}</span>`).join('')
+    : '<span style="color:var(--muted);font-size:13px">None detected</span>';
+  missingEl.innerHTML = result.missing_skills.length
+    ? result.missing_skills.map(s => `<span class="pill pill-miss">✗ ${s}</span>`).join('')
+    : '<span style="color:var(--success);font-size:13px">All key skills matched!</span>';
+
+  // Cover letter
+  document.getElementById('coverLetterText').textContent = result.cover_letter;
+
+  // Export links
+  if (jobId) {
+    document.getElementById('exportPdf').href = `${API}/export/${jobId}/pdf`;
+    document.getElementById('exportDocx').href = `${API}/export/${jobId}/docx`;
+    document.getElementById('exportMd').href = `${API}/export/${jobId}/md`;
+    document.getElementById('exportRow').style.display = 'flex';
+  } else {
+    // Sync mode: no job_id, hide export links
+    document.getElementById('exportRow').style.display = 'none';
+  }
+
+  // Tweaks
+  const tweaks = result.resume_tweaks.filter(t => t.original || t.suggested);
+  if (tweaks.length) {
+    document.getElementById('tweaksCard').style.display = 'block';
+    document.getElementById('tweaksList').innerHTML = tweaks.map((t, i) => `
+      <div class="tweak">
+        <div class="tweak-header">
+          <span class="tweak-badge">${t.section}</span>
+          <span class="tweak-reason">${t.reason}</span>
+        </div>
+        <div class="tweak-body">
+          ${t.original ? `<div class="tweak-row tweak-before"><span>BEFORE</span>${t.original}</div>` : ''}
+          ${t.suggested ? `<div class="tweak-row tweak-after"><span>AFTER &nbsp;</span>${t.suggested}</div>` : ''}
+        </div>
+      </div>`).join('');
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function showStatus(text, progress) {
+  document.getElementById('statusBar').classList.add('visible');
+  document.getElementById('statusText').textContent = text;
+  setProgress(progress);
+}
+function hideStatus() { document.getElementById('statusBar').classList.remove('visible'); }
+function setProgress(p) { document.getElementById('progressFill').style.width = p + '%'; }
+function stepActive(id) {
+  const el = document.getElementById('step-' + id);
+  if (el) { el.className = 'step active'; }
+}
+function stepDone(id) {
+  const el = document.getElementById('step-' + id);
+  if (el) { el.className = 'step done'; }
+}
+function setSubmitting(state) {
+  document.getElementById('submitBtn').disabled = state;
+  document.getElementById('submitBtn').textContent = state ? '⧖ Processing…' : '✦ Generate Cover Letter & Tweaks';
+}
+function showError(msg) {
+  const el = document.getElementById('errorBanner');
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('visible');
+}
+function clearError() { document.getElementById('errorBanner').classList.remove('visible'); }
+function copyText() {
+  const text = document.getElementById('coverLetterText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = '⎘ Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>

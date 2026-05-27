@@ -26,3 +26,8 @@ loguru==0.7.2
 # Phase 2: Kafka + Redis
 aiokafka==0.10.0
 redis[asyncio]==5.0.4
+
+# ── Phase 3: Export ──────────────────────────────────────────
+reportlab==4.1.0
+python-docx==1.1.2
+ 

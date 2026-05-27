@@ -164,3 +164,54 @@ async def health():
         except Exception as e:
             backends[name] = {"available": False, "error": str(e)}
     return {"status": "ok", "backends": backends}
+
+
+# ── Phase 3: Export endpoints ─────────────────────────────────
+
+from fastapi.responses import Response
+from app.services.exporter import export_pdf, export_docx, export_markdown
+
+
+@router.get("/export/{job_id}/pdf", summary="Download result as PDF")
+async def export_pdf_endpoint(job_id: str):
+    state = await get_job(job_id)
+    if not state:
+        raise HTTPException(404, f"Job '{job_id}' not found or expired.")
+    if state.status.value != "done" or not state.result:
+        raise HTTPException(400, f"Job is not done yet (status: {state.status.value}).")
+    pdf_bytes = export_pdf(state.result)
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=resume_report_{job_id[:8]}.pdf"},
+    )
+
+
+@router.get("/export/{job_id}/docx", summary="Download result as DOCX")
+async def export_docx_endpoint(job_id: str):
+    state = await get_job(job_id)
+    if not state:
+        raise HTTPException(404, f"Job '{job_id}' not found or expired.")
+    if state.status.value != "done" or not state.result:
+        raise HTTPException(400, f"Job is not done yet (status: {state.status.value}).")
+    docx_bytes = export_docx(state.result)
+    return Response(
+        content=docx_bytes,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f"attachment; filename=resume_report_{job_id[:8]}.docx"},
+    )
+
+
+@router.get("/export/{job_id}/md", summary="Download result as Markdown")
+async def export_md_endpoint(job_id: str):
+    state = await get_job(job_id)
+    if not state:
+        raise HTTPException(404, f"Job '{job_id}' not found or expired.")
+    if state.status.value != "done" or not state.result:
+        raise HTTPException(400, f"Job is not done yet (status: {state.status.value}).")
+    md_bytes = export_markdown(state.result)
+    return Response(
+        content=md_bytes,
+        media_type="text/markdown",
+        headers={"Content-Disposition": f"attachment; filename=resume_report_{job_id[:8]}.md"},
+    )
